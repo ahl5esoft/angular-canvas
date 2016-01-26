@@ -1,0 +1,23 @@
+var ATTR_MAP = {
+	children: null,
+	color: 'string',
+	display: 'bool',
+	height: 'int',
+	id: 'string',
+	image: null,
+	lineWidth: 'int',
+	name: 'string',
+	sHeight: 'int',
+	size: 'int',
+	style: 'string',
+	sWidth: 'int',
+	sX: 'int',
+	sY: 'int',
+	text: 'string',
+	variant: 'string',
+	weight: 'string',
+	width: 'int',
+	x: 'int',
+	y: 'int',
+	zIndex: 'int'
+};
