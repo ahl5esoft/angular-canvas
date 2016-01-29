@@ -6,6 +6,7 @@ angular.module('ac.core.node', []).factory('acCoreNode', [
 				children: [],
 				display: true,
 				id: '',
+				over: false,
 				x: 0,
 				y: 0,
 				zIndex: 0
@@ -77,17 +78,41 @@ angular.module('ac.core.node', []).factory('acCoreNode', [
 			});
 		};
 
-		Node.prototype.trigger = function (eventName, e) {
-			if (this.getDisplay() && this.hit(e.x, e.y)) {
-				if (this._events[eventName])
-					this._events[eventName](e);
+		Node.prototype.fire = function (eventName, e) {
+			if (!this.getDisplay())
+				return;
 
-				for (var i = 0, l = this.getChildren().length; i < l; i++) {
-					this.getChildren()[i].trigger(eventName, event);
-					if (!event._isBubble)
-						break;
+			if (eventName === 'mousemove') {
+				if (this.hit(e.x, e.y)) {
+					eventName = 'mouseover';
+				}
+				else if (this.getOver()) {
+					eventName = 'mouseout';
 				}
 			}
+			else if (!this.hit(e.x, e.y))
+				return;
+
+			for (var i = 0, l = this.getChildren().length; i < l; i++) {
+				this.getChildren()[i].trigger(eventName, event);
+				if (!event._isBubble)
+					break;
+			}
+
+			switch (eventName) {
+				case 'mouseover':
+					if (this.getOver())
+						return;
+
+					this.setOver(true);
+					break;
+				case 'mouseout':
+					this.setOver(false);
+					break;
+			}
+
+			if (this._events[eventName])
+				this._events[eventName](e);
 		};
 
 		Node.prototype.hit = function (x, y) {

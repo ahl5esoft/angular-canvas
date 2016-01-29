@@ -2,6 +2,22 @@ angular.module('ac.core.context', []).factory('acCoreContext', [
 	'$document', '$interval',
 	function ($document, $interval) {
 		var FRAME = 1000 / 50; //50帧/s
+		var bindEvent = function (el) {
+			$.each(['click', 'dblclick', 'mousemove'], function (eventName) {
+				el.bind(eventName, function (e) {
+					var event = {
+						x: e.x,
+						y: e.y,
+						_isBubble: true,
+						stopBubbling: function () {
+							this._isBubble = false;
+						}
+					};
+					if (stage)
+						stage.trigger(eventName, event);
+				});
+			});
+		};
 		var ctx, stage;
 
 		return {

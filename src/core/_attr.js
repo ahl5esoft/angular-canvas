@@ -7,6 +7,7 @@ var ATTR_MAP = {
 	image: null,
 	lineWidth: 'int',
 	name: 'string',
+	over: 'bool',
 	sHeight: 'int',
 	size: 'int',
 	style: 'string',
