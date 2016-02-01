@@ -78,27 +78,25 @@ angular.module('ac.core.node', []).factory('acCoreNode', [
 			});
 		};
 
-		Node.prototype.fire = function (eventName, e) {
+		Node.prototype.fire = function (evt) {
 			if (!this.getDisplay())
 				return;
 
-			if (eventName === 'mousemove') {
-				if (this.hit(e.x, e.y)) {
+			var eventName = evt.name;
+			if (evt.name === 'mousemove') {
+				if (this.hit(evt.x, evt.y)) 
 					eventName = 'mouseover';
-				}
-				else if (this.getOver()) {
+				else if (this.getOver())
 					eventName = 'mouseout';
-				}
 			}
-			else if (!this.hit(e.x, e.y))
+			else if (!this.hit(evt.x, evt.y))
 				return;
 
-			for (var i = 0, l = this.getChildren().length; i < l; i++) {
-				this.getChildren()[i].trigger(eventName, event);
-				if (!event._isBubble)
-					break;
-			}
+			fireEvent(this, evt);
 
+			if (eventName == evt.name)
+				return;
+			
 			switch (eventName) {
 				case 'mouseover':
 					if (this.getOver())
@@ -111,8 +109,20 @@ angular.module('ac.core.node', []).factory('acCoreNode', [
 					break;
 			}
 
-			if (this._events[eventName])
-				this._events[eventName](e);
+			evt.name = eventName;
+			fireEvent(this, evt);
+		};
+
+		var fireEvent = function (node, evt) {
+			var isBubble = $.all(node.getChildren(), function (child) {
+				child.fire(evt);
+				return evt.isBubble;
+			});
+			if (!isBubble)
+				return;
+
+			if (node._events[evt.name])
+				node._events[evt.name](evt);
 		};
 
 		Node.prototype.hit = function (x, y) {
@@ -133,6 +143,11 @@ angular.module('ac.core.node', []).factory('acCoreNode', [
 					return;
 			}
 			children.push(node);
+			this.setChildren(
+				$.sortBy(children, function (n) {
+					return -node.getZIndex();
+				})
+			);
 		};
 
 		return Node;

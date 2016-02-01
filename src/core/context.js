@@ -2,23 +2,8 @@ angular.module('ac.core.context', []).factory('acCoreContext', [
 	'$document', '$interval',
 	function ($document, $interval) {
 		var FRAME = 1000 / 50; //50帧/s
-		var bindEvent = function (el) {
-			$.each(['click', 'dblclick', 'mousemove'], function (eventName) {
-				el.bind(eventName, function (e) {
-					var event = {
-						x: e.x,
-						y: e.y,
-						_isBubble: true,
-						stopBubbling: function () {
-							this._isBubble = false;
-						}
-					};
-					if (stage)
-						stage.trigger(eventName, event);
-				});
-			});
-		};
-		var ctx, stage;
+		var nodes = [];
+		var ctx;
 
 		return {
 			init: function (width, height) {
@@ -34,16 +19,21 @@ angular.module('ac.core.context', []).factory('acCoreContext', [
 
 				$.each(['click', 'dblclick', 'mousemove'], function (eventName) {
 					el.bind(eventName, function (e) {
-						var event = {
+						var evt = {
+							isBubble: true,
+							name: eventName,
 							x: e.x,
 							y: e.y,
-							_isBubble: true,
 							stopBubbling: function () {
-								this._isBubble = false;
+								this.isBubble = false;
 							}
 						};
-						if (stage)
-							stage.trigger(eventName, event);
+
+						for (var i = 0, l = nodes.length; i < l; i++) {
+							nodes[i].fire(evt);
+							if (nodes[i].hit(evt.x, evt.y))
+								break;
+						}
 					});
 				});
 				
@@ -52,16 +42,22 @@ angular.module('ac.core.context', []).factory('acCoreContext', [
 				$interval(function () {
 					ctx.clearRect(0, 0, width, height);
 
-					if (stage)
-						stage.draw(ctx);
+					$.chain(nodes).select(function (node) {
+						return node.getDisplay();
+					}).each(function (node) {
+						node.draw(ctx);
+					});
 				}, FRAME);
 			},
-			setStage: function (_stage) {
-				stage = _stage;
+			clear: function () {
+				nodes = [];
 			},
-			addNode: function (node) {
-				if (stage)
-					stage.addChild(node);
+			add: function (node) {
+				nodes.push(node);
+
+				nodes = $.sortBy(nodes, function (n) {
+					return -node.getZIndex();
+				});
 			}
 		};
 	}

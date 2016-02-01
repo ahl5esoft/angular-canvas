@@ -13,18 +13,13 @@ angular.module('ac.ui.node', ['ac.core.context', 'ac.util.strconv']).directive('
 
 						if (draw)
 							node.draw = draw;
-
 					};
 
 					if (attrs.acUiNode === 'stage') {
-						ctx.setStage(node);
-
-						node.hit = function () {
-							return true;
-						};
+						ctx.clear();
 					}
 					else {
-						ctx.addNode(node);
+						ctx.add(node);
 					}
 				}
 			],
