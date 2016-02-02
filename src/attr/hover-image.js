@@ -16,12 +16,12 @@ angular.module('ac.attr.hover-image', []).directive('acAttrHoverImage', [
 
 					img.onload = function () {
 						nodeCtrl.node.attr({
+							image: img,
 							sWidth: img.width / 2,
 							sHeight: img.height,
 							width: img.width / 2,
 							height: img.height
 						});
-						nodeCtrl.node.setImage(img);
 						
 						nodeCtrl.node.bind('mouseover', function () {
 							nodeCtrl.node.attr({

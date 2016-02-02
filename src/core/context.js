@@ -1,7 +1,6 @@
-angular.module('ac.core.context', []).factory('acCoreContext', [
-	'$document', '$interval',
-	function ($document, $interval) {
-		var FRAME = 1000 / 50; //50帧/s
+angular.module('ac.core.context', ['ac.core.animation']).factory('acCoreContext', [
+	'$document', '$interval', 'acCoreAnimation',
+	function ($document, $interval, animation) {
 		var nodes = [];
 		var ctx;
 
@@ -39,15 +38,20 @@ angular.module('ac.core.context', []).factory('acCoreContext', [
 				
 				ctx = el[0].getContext('2d');
 				
-				$interval(function () {
-					ctx.clearRect(0, 0, width, height);
+				$interval(
+					function () {
+						ctx.clearRect(0, 0, width, height);
 
-					$.chain(nodes).select(function (node) {
-						return node.getDisplay();
-					}).each(function (node) {
-						node.draw(ctx);
-					});
-				}, FRAME);
+						animation.run();
+
+						$.chain(nodes).select(function (node) {
+							return node.getDisplay();
+						}).each(function (node) {
+							node.draw(ctx);
+						});
+					}, 
+					1000 / animation.FRAME
+				);
 			},
 			clear: function () {
 				nodes = [];
