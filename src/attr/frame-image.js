@@ -1,22 +1,26 @@
 /*
-	<br x="横向帧数" y="纵向帧数" x-i="横向帧下标" y-i="纵向帧下标" ac-attr-frame-image="图片路径" />
+	<br x="横向帧数" y="纵向帧数" x-index="横向帧下标" y-index="纵向帧下标" ac-attr-frame-image="图片路径" />
 */
 angular.module('ac.attr.frame-image', ['ac.core.animation', 'ac.util.strconv']).directive('acAttrFrameImage', [
 	'acCoreAnimation', 'acUtilStrconv',
 	function (animation, strconv) {
 		return {
 			require: '?^acUiNode',
-			link: function (scope, _, attrs, nodeCtrl) {
+			link: function (scope, el, attrs, nodeCtrl) {
 				var xIndex = 0;
 				var yIndex = 0;
 				var xMax = strconv.toInt(attrs.x);
 				var yMax = strconv.toInt(attrs.y);
 
-				scope.$watch(attrs.xI, function (v) {
-					xIndex = v < xMax ? v : 0;
-				});
+				scope.$watch(
+					//attrs无法获取到xI 而是i 因此此处只能使用el.attr('x-i')
+					el.attr('x-i'), 
+					function (v) {
+						xIndex = v < xMax ? v : 0;
+					}
+				);
 
-				scope.$watch(attrs.yI, function (v) {
+				scope.$watch(attrs.yIndex, function (v) {
 					yIndex = v < yMax ? v : 0;
 				});
 
